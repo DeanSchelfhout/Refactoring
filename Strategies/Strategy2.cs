@@ -15,6 +15,7 @@ namespace ConsoleAppSquareMaster.Strategies
         public int[,] Conquer(int nEmpires, int turns)
         {
             Dictionary<int, List<(int, int)>> empires = new();
+
             int x, y;
             for (int i = 0; i < nEmpires; i++)
             {
