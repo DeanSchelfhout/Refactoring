@@ -13,7 +13,7 @@ namespace ConsoleAppSquareMaster
     {
         private const int drawingFactor = 8;
         private string path=@"c:\temp\world";
-        public void DrawWorld(int[,] world,int worldNumber)
+        public void DrawWorld(int[,] world,int worldNumber,int gameNumber)
         {
             Color[] cvalues = new Color[] {Color.Green, Color.Red, Color.Yellow, Color.Blue, Color.Cyan, Color.GreenYellow,Color.Gold,Color.Ivory,Color.NavajoWhite };
             Bitmap bm = new Bitmap(world.GetLength(0) * drawingFactor, world.GetLength(1)* drawingFactor);
@@ -38,7 +38,7 @@ namespace ConsoleAppSquareMaster
                         }
                     }
                 }
-            bm.Save(Path.Combine(path, $"world{worldNumber}.jpg"), ImageFormat.Jpeg);
+            bm.Save(Path.Combine(path, $"world{worldNumber}-{gameNumber}.jpg"), ImageFormat.Jpeg);
         }
     }
 }

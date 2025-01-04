@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppSquareMaster.Models
 {
-    public class Empire
+    public class Game
     {
         [BsonId]
-        public int EmpireID { get; set; }
-        public string Name { get; set; }
-        public int Strategy { get; set; }
+        public int GameNumber{ get; set; }
+        public List<EmpireStatistics> Empires{ get; set; }
     }
 }

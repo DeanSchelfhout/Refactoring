@@ -8,6 +8,6 @@ namespace ConsoleAppSquareMaster.Strategies
 {
     public interface IStrategy
     {
-        int[,] Conquer(bool[,] world, int empireID, int turns);
+        (int[,] worldEmpires,int x,int y) Conquer(bool[,] world, int empireID, int turns);
     }
 }

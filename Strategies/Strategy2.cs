@@ -6,10 +6,11 @@ namespace ConsoleAppSquareMaster.Strategies
     {
         private Random random = new Random(1);
 
-        public int[,] Conquer(bool[,] world, int empireID, int turns)
+        public (int[,] worldEmpires,int x,int y) Conquer(bool[,] world, int empireID, int turns)
         {
             int maxX = world.GetLength(0);
             int maxY = world.GetLength(1);
+            int x = 0, y = 0;
             int[,] worldEmpires = InitializeWorldEmpires(world, maxX, maxY);
             Dictionary<int, List<(int, int)>> empires = InitializeEmpires(world, empireID, worldEmpires);
 
@@ -18,12 +19,12 @@ namespace ConsoleAppSquareMaster.Strategies
                 foreach (var empire in empires)
                 {
                     int index = FindWithMostEmptyNeighbours(empire.Value, worldEmpires, maxX, maxY);
-                    (int x, int y) = empire.Value[index];
+                    (x, y) = empire.Value[index];
                     ExpandEmpire(worldEmpires, empires, empire.Key, x, y, maxX, maxY);
                 }
             }
 
-            return worldEmpires;
+            return (worldEmpires, x, y);
         }
 
         private int[,] InitializeWorldEmpires(bool[,] world, int maxX, int maxY)

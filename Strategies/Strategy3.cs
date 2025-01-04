@@ -10,12 +10,19 @@ namespace ConsoleAppSquareMaster.Strategies
     {
         private Random random = new Random(1);
 
-        public int[,] Conquer(bool[,] world, int empireID, int turns)
+        public (int[,] worldEmpires, int x, int y) Conquer(bool[,] world, int empireID, int turns)
         {
             int maxX = world.GetLength(0);
             int maxY = world.GetLength(1);
+            int x = 0, y = 0; // To track the start position
             int[,] worldEmpires = InitializeWorldEmpires(world, maxX, maxY);
-            Dictionary<int, List<(int, int)>> empires = InitializeEmpires(world, empireID, worldEmpires);
+            var empires = InitializeEmpires(world, empireID, worldEmpires);
+
+            // Get the start position for the first empire
+            if (empires.ContainsKey(empireID) && empires[empireID].Count > 0)
+            {
+                (x, y) = empires[empireID][0];
+            }
 
             for (int t = 0; t < turns; t++)
             {
@@ -25,8 +32,9 @@ namespace ConsoleAppSquareMaster.Strategies
                 }
             }
 
-            return worldEmpires;
+            return (worldEmpires, x, y);
         }
+
 
         private int[,] InitializeWorldEmpires(bool[,] world, int maxX, int maxY)
         {
