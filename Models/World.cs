@@ -16,5 +16,7 @@ namespace ConsoleAppSquareMaster.Models
         public int Maxy { get; set; }
         public double Coverage { get; set; }
         public bool[,] Grid { get; set; }
+        public int Algorythm { get; set; }
+        public List<Empire> Empires { get; set; }
     }
 }

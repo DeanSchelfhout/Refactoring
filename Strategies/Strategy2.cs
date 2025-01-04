@@ -1,80 +1,115 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ConsoleAppSquareMaster;
 
 namespace ConsoleAppSquareMaster.Strategies
 {
-    public class Strategy2 : StrategyBase, IStrategy
+    public class Strategy2 : IStrategy
     {
-        public Strategy2(bool[,] world) : base(world)
+        private Random random = new Random(1);
+
+        public int[,] Conquer(bool[,] world, int empireID, int turns)
         {
+            int maxX = world.GetLength(0);
+            int maxY = world.GetLength(1);
+            int[,] worldEmpires = InitializeWorldEmpires(world, maxX, maxY);
+            Dictionary<int, List<(int, int)>> empires = InitializeEmpires(world, empireID, worldEmpires);
+
+            for (int t = 0; t < turns; t++)
+            {
+                foreach (var empire in empires)
+                {
+                    int index = FindWithMostEmptyNeighbours(empire.Value, worldEmpires, maxX, maxY);
+                    (int x, int y) = empire.Value[index];
+                    ExpandEmpire(worldEmpires, empires, empire.Key, x, y, maxX, maxY);
+                }
+            }
+
+            return worldEmpires;
         }
 
-        public int[,] Conquer(int nEmpires, int turns)
+        private int[,] InitializeWorldEmpires(bool[,] world, int maxX, int maxY)
         {
-            Dictionary<int, List<(int, int)>> empires = new();
+            int[,] worldEmpires = new int[maxX, maxY];
+            for (int i = 0; i < maxX; i++)
+                for (int j = 0; j < maxY; j++)
+                    worldEmpires[i, j] = world[i, j] ? 0 : -1;
+            return worldEmpires;
+        }
 
-            int x, y;
-            for (int i = 0; i < nEmpires; i++)
+        private Dictionary<int, List<(int, int)>> InitializeEmpires(bool[,] world, int nEmpires, int[,] worldEmpires)
+        {
+            var empires = new Dictionary<int, List<(int, int)>>();
+            int maxX = world.GetLength(0), maxY = world.GetLength(1);
+            for (int i = 1; i <= nEmpires; i++)
             {
-                bool ok = false;
-                while (!ok)
+                bool placed = false;
+                while (!placed)
                 {
-                    x = random.Next(maxx); y = random.Next(maxy);
-                    if (world[x, y])
+                    int x = random.Next(maxX), y = random.Next(maxY);
+                    if (world[x, y] && worldEmpires[x, y] == 0)
                     {
-                        ok = true;
-                        worldempires[x, y] = i + 1;
-                        empires.Add(i + 1, new List<(int, int)>() { (x, y) });
+                        worldEmpires[x, y] = i;
+                        empires[i] = new List<(int, int)> { (x, y) };
+                        placed = true;
                     }
                 }
             }
-            int index;
-            int direction;
-            for (int i = 0; i < turns; i++)
+            return empires;
+        }
+
+        private int FindWithMostEmptyNeighbours(List<(int, int)> empireCells, int[,] worldEmpires, int maxX, int maxY)
+        {
+            int maxEmpty = -1;
+            List<int> candidates = new();
+
+            for (int i = 0; i < empireCells.Count; i++)
             {
-                for (int e = 1; e <= nEmpires; e++)
+                var (x, y) = empireCells[i];
+                int emptyCount = CountEmptyNeighbours(x, y, worldEmpires, maxX, maxY);
+
+                if (emptyCount > maxEmpty)
                 {
-                    index = FindWithMostEmptyNeighbours(e, empires[e]);
-                    direction = random.Next(4);
-                    x = empires[e][index].Item1;
-                    y = empires[e][index].Item2;
-                    switch (direction)
-                    {
-                        case 0:
-                            if (x < maxx - 1 && worldempires[x + 1, y] == 0)
-                            {
-                                worldempires[x + 1, y] = e;
-                                empires[e].Add((x + 1, y));
-                            }
-                            break;
-                        case 1:
-                            if (x > 0 && worldempires[x - 1, y] == 0)
-                            {
-                                worldempires[x - 1, y] = e;
-                                empires[e].Add((x - 1, y));
-                            }
-                            break;
-                        case 2:
-                            if (y < maxy - 1 && worldempires[x, y + 1] == 0)
-                            {
-                                worldempires[x, y + 1] = e;
-                                empires[e].Add((x, y + 1));
-                            }
-                            break;
-                        case 3:
-                            if (y > 0 && worldempires[x, y - 1] == 0)
-                            {
-                                worldempires[x, y - 1] = e;
-                                empires[e].Add((x, y - 1));
-                            }
-                            break;
-                    }
+                    maxEmpty = emptyCount;
+                    candidates.Clear();
+                    candidates.Add(i);
+                }
+                else if (emptyCount == maxEmpty)
+                {
+                    candidates.Add(i);
                 }
             }
-            return worldempires;
+
+            return candidates[random.Next(candidates.Count)];
+        }
+
+        private int CountEmptyNeighbours(int x, int y, int[,] worldEmpires, int maxX, int maxY)
+        {
+            int count = 0;
+
+            if (x > 0 && worldEmpires[x - 1, y] == 0) count++;
+            if (x < maxX - 1 && worldEmpires[x + 1, y] == 0) count++;
+            if (y > 0 && worldEmpires[x, y - 1] == 0) count++;
+            if (y < maxY - 1 && worldEmpires[x, y + 1] == 0) count++;
+
+            return count;
+        }
+
+        private void ExpandEmpire(int[,] worldEmpires, Dictionary<int, List<(int, int)>> empires, int empireId, int x, int y, int maxX, int maxY)
+        {
+            var directions = new List<(int dx, int dy)>
+            {
+                (1, 0), (-1, 0), (0, 1), (0, -1)
+            };
+
+            foreach (var (dx, dy) in directions.OrderBy(_ => random.Next()))
+            {
+                int newX = x + dx, newY = y + dy;
+                if (newX >= 0 && newX < maxX && newY >= 0 && newY < maxY && worldEmpires[newX, newY] == 0)
+                {
+                    worldEmpires[newX, newY] = empireId;
+                    empires[empireId].Add((newX, newY));
+                    return;
+                }
+            }
         }
     }
 }

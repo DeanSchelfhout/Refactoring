@@ -12,7 +12,7 @@ namespace ConsoleAppSquareMaster.Models
         [BsonId]
         public int EmpireID { get; set; }
         public string Name { get; set; }
-        public object Strategy { get; set; }
+        public int Strategy { get; set; }
         public bool[,] StartPosition { get; set; }
         public int Coverage { get; set; }
         public double WorldCoverage { get; set; }
