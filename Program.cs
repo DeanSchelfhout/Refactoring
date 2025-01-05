@@ -62,10 +62,13 @@ namespace ConsoleAppSquareMaster
 
             var statistics = World.GetStrategyStatistics();
             strategy1Statistics.AVGCellsConquered = statistics.c1 / 30;
+            strategy1Statistics.CellsConquered = statistics.c1;
             strategy1Statistics.AVGWorldConquered = $"{Math.Round((statistics.w1 / 30),2)}%";
             strategy2Statistics.AVGCellsConquered = statistics.c2 / 30;
+            strategy2Statistics.CellsConquered = statistics.c2;
             strategy2Statistics.AVGWorldConquered = $"{Math.Round((statistics.w2 / 30), 2)}%";
             strategy3Statistics.AVGCellsConquered = statistics.c3 / 30;
+            strategy3Statistics.CellsConquered = statistics.c3;
             strategy3Statistics.AVGWorldConquered = $"{Math.Round((statistics.w3 / 30), 2)}%";
 
             strategy1Statistics.Strategy = 1;

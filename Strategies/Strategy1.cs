@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ConsoleAppSquareMaster.Strategies;
 public class Strategy1 : IStrategy
 {
-    private Random random = new Random(1);
+    private Random random = new Random();
 
     public (int[,] worldEmpires,int x,int y) Conquer(bool[,] world, int empireID, int turns)
     {
