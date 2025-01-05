@@ -22,6 +22,9 @@ namespace ConsoleAppSquareMaster
             var worldStatisticsCollection = database.GetCollection<WorldStatistics>("WorldStatistics");
             await worldStatisticsCollection.DeleteManyAsync(FilterDefinition<WorldStatistics>.Empty);
 
+            var StrategyStatisticsCollection = database.GetCollection<StrategyStatistics>("StrategyStatistics");
+            await StrategyStatisticsCollection.DeleteManyAsync(FilterDefinition<StrategyStatistics>.Empty);
+
             List<Task> tasks = new List<Task>();
 
             for (int i = 0; i < 10; i++)
@@ -51,6 +54,29 @@ namespace ConsoleAppSquareMaster
                 }));
             }
             await Task.WhenAll(tasks);
+
+            List<StrategyStatistics> strategyStatistics = new List<StrategyStatistics>();
+            StrategyStatistics strategy1Statistics = new StrategyStatistics();
+            StrategyStatistics strategy2Statistics = new StrategyStatistics();
+            StrategyStatistics strategy3Statistics = new StrategyStatistics();
+
+            var statistics = World.GetStrategyStatistics();
+            strategy1Statistics.AVGCellsConquered = statistics.c1 / 30;
+            strategy1Statistics.AVGWorldConquered = $"{Math.Round((statistics.w1 / 30),2)}%";
+            strategy2Statistics.AVGCellsConquered = statistics.c2 / 30;
+            strategy2Statistics.AVGWorldConquered = $"{Math.Round((statistics.w2 / 30), 2)}%";
+            strategy3Statistics.AVGCellsConquered = statistics.c3 / 30;
+            strategy3Statistics.AVGWorldConquered = $"{Math.Round((statistics.w3 / 30), 2)}%";
+
+            strategy1Statistics.Strategy = 1;
+            strategy2Statistics.Strategy = 2;
+            strategy3Statistics.Strategy = 3;
+
+            strategyStatistics.Add(strategy1Statistics);
+            strategyStatistics.Add(strategy2Statistics);
+            strategyStatistics.Add(strategy3Statistics);
+
+            await StrategyStatisticsCollection.InsertManyAsync(strategyStatistics);
 
             Console.WriteLine("Program Complete!");
         }

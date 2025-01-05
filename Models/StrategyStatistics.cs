@@ -11,6 +11,7 @@ namespace ConsoleAppSquareMaster.Models
     {
         [BsonId]
         public int Strategy { get; set; }
-
+        public int AVGCellsConquered { get; set; }
+        public string AVGWorldConquered { get; set; }
     }
 }

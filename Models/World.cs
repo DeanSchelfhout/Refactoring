@@ -118,6 +118,18 @@ namespace ConsoleAppSquareMaster.Models
                         double percentage = (conqueredCount / worldCount) * 100;
                         empireStatisticsList[i].WorldConquered = Math.Round(percentage, 2) + "%";
                         empireStatisticsList[i].CellsConquered = Convert.ToInt32(conqueredCount);
+                        switch (empireStatisticsList[i].Strategy)
+                        {
+                            case 1:
+                                Strategy1Statistics(empireStatisticsList[i].CellsConquered, Math.Round(percentage,2));
+                                break;
+                            case 2:
+                                Strategy2Statistics(empireStatisticsList[i].CellsConquered, Math.Round(percentage, 2));
+                                break;
+                            case 3:
+                                Strategy3Statistics(empireStatisticsList[i].CellsConquered, Math.Round(percentage, 2));
+                                break;
+                        }
                     }
                 }
             }
@@ -128,6 +140,33 @@ namespace ConsoleAppSquareMaster.Models
             PrintImage(ww, world.WorldNumber,gameNumber);
             Console.WriteLine($"Done Simulating World {world.WorldNumber} Game {gameNumber}");
             return game;
+        }
+        private static int TotalCellsConquered1 = 0;
+        private static double TotalWorldConquered1 = 0;
+        private static int TotalCellsConquered2 = 0;
+        private static double TotalWorldConquered2 = 0;
+        private static int TotalCellsConquered3 = 0;
+        private static double TotalWorldConquered3 = 0;
+
+        private static void Strategy1Statistics(int cells,double world)
+        {
+            TotalCellsConquered1 += cells;
+            TotalWorldConquered1 += world;
+        }
+        private static void Strategy2Statistics(int cells, double world)
+        {
+            TotalCellsConquered2 += cells;
+            TotalWorldConquered2 += world;
+        }
+        private static void Strategy3Statistics(int cells, double world)
+        {
+            TotalCellsConquered3 += cells;
+            TotalWorldConquered3 += world;
+        }
+
+        public static (int c1,int c2, int c3, double w1, double w2, double w3) GetStrategyStatistics()
+        {
+            return (TotalCellsConquered1, TotalCellsConquered2, TotalCellsConquered3, TotalWorldConquered1, TotalWorldConquered2, TotalWorldConquered3);
         }
 
         [BsonId]
