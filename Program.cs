@@ -15,7 +15,6 @@ namespace ConsoleAppSquareMaster
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase("SquareMaster");
 
-
             var worldCollection = database.GetCollection<World>("World");
             await worldCollection.DeleteManyAsync(FilterDefinition<World>.Empty);
 
@@ -39,20 +38,25 @@ namespace ConsoleAppSquareMaster
                     await worldCollection.InsertOneAsync(world);
                     Console.WriteLine("Done generating world " + world.WorldNumber);
                     //World.PrintWorld(world);
+
+                    List<Task<Game>> gameTasks = new List<Task<Game>>();
+                    for (int j = 1; j <= 3; j++)
+                    {
+                        int gameNumber = j;
+                        gameTasks.Add(World.SimulateAsync(world, gameNumber));
+                    }
+
+                    Game[] games = await Task.WhenAll(gameTasks);
+
                     WorldStatistics worldStatistics = new WorldStatistics();
                     worldStatistics.WorldNumber = world.WorldNumber;
                     worldStatistics.WorldName = world.Name;
-                    List<Game> games = new List<Game>();
-                    for (int i = 1; i <= 3; i++)
-                    {
-                        int gameNumber = i;
-                        Game game = await World.SimulateAsync(world, gameNumber);
-                        games.Add(game);
-                    }
-                    worldStatistics.Games = games;
+                    worldStatistics.Games = games.ToList();
+
                     await worldStatisticsCollection.InsertOneAsync(worldStatistics);
                 }));
             }
+
             await Task.WhenAll(tasks);
 
             List<StrategyStatistics> strategyStatistics = new List<StrategyStatistics>();
@@ -63,7 +67,7 @@ namespace ConsoleAppSquareMaster
             var statistics = World.GetStrategyStatistics();
             strategy1Statistics.AVGCellsConquered = statistics.c1 / 30;
             strategy1Statistics.CellsConquered = statistics.c1;
-            strategy1Statistics.AVGWorldConquered = $"{Math.Round((statistics.w1 / 30),2)}%";
+            strategy1Statistics.AVGWorldConquered = $"{Math.Round((statistics.w1 / 30), 2)}%";
             strategy2Statistics.AVGCellsConquered = statistics.c2 / 30;
             strategy2Statistics.CellsConquered = statistics.c2;
             strategy2Statistics.AVGWorldConquered = $"{Math.Round((statistics.w2 / 30), 2)}%";
@@ -83,7 +87,7 @@ namespace ConsoleAppSquareMaster
 
             Console.WriteLine("Program Complete!");
         }
-        
+
         static async Task<List<Empire>> GenerateEmpiresAsync()
         {
             int nEmpires = new Random().Next(4, 9);
@@ -113,6 +117,7 @@ namespace ConsoleAppSquareMaster
             }
             return empires;
         }
+
         static async Task<World> GenerateWorldAsync(int wNumber)
         {
             World world = new World();
